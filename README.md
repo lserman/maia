@@ -103,7 +103,7 @@ Will generate the following GCM payload (see [this table](https://developers.goo
     "sound": "default",
     "badge": 2
   },
-  ...
+  "registration_ids": ["<TOKEN1>", "<TOKEN2>"]
 }
 ```
 
