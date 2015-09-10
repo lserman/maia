@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.name        = 'maia'
   s.version     = Maia::VERSION
   s.authors     = ['Logan Serman']
-  s.email       = ['logan.serman@metova.com']
+  s.email       = ['loganserman@gmail.com']
   s.homepage    = 'https://github.com/lserman/maia'
   s.summary     = 'Manage device tokens and push messaging with Rails and Mercurius.'
   s.description = s.summary
