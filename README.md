@@ -57,7 +57,13 @@ Devices can register with your application by submitting a POST to your devices 
 
 Where `<TOKEN>` is the token from GCM registration.
 
-## Expiration
+## Device Management
+
+When GCM responds with an invalid or unregistered device token, the device record will be destroyed from the database.
+
+When GCM responds with a canonical ID, the device record will be updated so that it's `token` field will be equal to the canonical ID given by GCM.
+
+## Device Expiration
 
 Devices will expire after 14 days. This is to ensure user's who sell or otherwise give away their device will not be tied to that device forever. Each
 time a POST to Devices is received, the token expiration will be refreshed.
