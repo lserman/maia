@@ -111,7 +111,7 @@ Will generate the following GCM payload (see [this table](https://developers.goo
 
 ## iOS Content available
 
-To send `"content_available": true` with the GCM payload,,override `content_available?` in your message to return a truthy value:
+To send `"content_available": true` with the GCM payload, override `content_available?` in your message to return a truthy value:
 
 ```ruby
 class ExampleMessage < Maia::Message
