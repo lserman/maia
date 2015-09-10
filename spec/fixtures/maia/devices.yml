@@ -1,0 +1,7 @@
+logan:
+  token: 'logan123'
+  pushable: logan (User)
+
+john:
+  token: 'john123'
+  pushable: john (User)

@@ -1,0 +1,26 @@
+<div class="container">
+  <% flash.each do |k, v| %>
+    <% klass = { notice: 'success', alert: 'danger' }.fetch(k.intern, 'info') %>
+    <div class="alert alert-<%= klass %>" role="alert"><%= v %></div>
+  <% end %>
+  <%= form_for @push, url: push_path, html: { class: 'console form col-md-6 col-md-offset-3' } do |f| %>
+    <div class="form-group">
+      <%= f.label :device_token %>
+      <%= f.text_field :device_token, class: 'form-control' %>
+    </div>
+    <div class="form-group">
+      <%= f.label :klass, 'Message' %>
+      <%= f.select :klass, ['', @klasses].flatten, {}, class: 'form-control' %>
+    </div>
+    <% @stubs.each do |stub| %>
+      <div class="form-group hide" data-klass="<%= stub.klass %>">
+        <%= f.label :data %>
+        <% stub.fields.each do |field, type| %>
+          <%= text_field_tag "console_push[#{stub.klass}][data][#{field}][value]", nil, placeholder: field, class: 'form-control' %>
+          <%= hidden_field_tag "console_push[#{stub.klass}][data][#{field}][type]", type.to_s %>
+        <% end %>
+      </div>
+    <% end %>
+    <%= f.submit 'Push', class: 'btn btn-primary' %>
+  <% end %>
+</div>
