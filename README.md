@@ -109,7 +109,7 @@ Will generate the following GCM payload (see [this table](https://developers.goo
 
 `Maia::Message` does not define a constructor so you can construct your message however you want.
 
-## iOS Content available
+## Content available
 
 To send `"content_available": true` with the GCM payload, override `content_available?` in your message to return a truthy value:
 
