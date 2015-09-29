@@ -42,10 +42,13 @@ module Maia
       false
     end
 
+    def dry_run?
+      false
+    end
+
     def to_h
-      {
+      hash = {
         data: other,
-        content_available: content_available?,
         notification: {
           title: alert,
           body: alert,
@@ -53,6 +56,10 @@ module Maia
           badge: badge
         }.compact
       }
+
+      hash.merge!(dry_run: true) if dry_run?
+      hash.merge!(content_available: true) if content_available?
+      hash
     end
   end
 end

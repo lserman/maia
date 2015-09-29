@@ -10,7 +10,6 @@ describe 'Messaging' do
         data: {
           data: 123
         },
-        content_available: false,
         notification: {
           title: 'This is an alert',
           body: 'This is an alert',
@@ -28,7 +27,6 @@ describe 'Messaging' do
         data: {
           data: 123
         },
-        content_available: false,
         notification: {
           title: 'This is an alert',
           body: 'This is an alert',
@@ -45,12 +43,12 @@ describe 'Messaging' do
         data: {
           data: 123
         },
-        content_available: true,
         notification: {
           title: 'This is an alert',
           body: 'This is an alert',
           sound: 'default'
         },
+        content_available: true,
         registration_ids: ['logan123']
       }.to_json
     end
@@ -63,7 +61,6 @@ describe 'Messaging' do
         data: {
           data: 123
         },
-        content_available: false,
         notification: {
           title: 'This is an alert',
           body: 'This is an alert',
@@ -82,7 +79,6 @@ describe 'Messaging' do
         data: {
           data: 123
         },
-        content_available: false,
         notification: {
           title: 'This is an alert',
           body: 'This is an alert',
@@ -107,12 +103,20 @@ describe 'Messaging' do
 
   context 'Device has canonical ID' do
     before do
-      expect_any_instance_of(Maia::Messenger).to receive(:connection) { GCM::CanonicalIdConnection.new('logan123' => 'canonical123') }
+      allow_any_instance_of(Maia::Messenger).to receive(:connection) { GCM::CanonicalIdConnection.new('logan123' => 'canonical123') }
     end
 
     it 'updates the device token to use a canonical ID if provided' do
       TestMessage.new.send_to User.all
       expect(maia_devices(:logan).reload.token).to eq 'canonical123'
+    end
+
+    it 'destroys the device if the user has another device registered with the same canonical ID' do
+      users(:logan).devices.first.update token: 'canonical123'
+      users(:logan).devices.create token: 'logan123'
+      TestMessage.new.send_to users(:logan)
+      expect(users(:logan).devices.count).to eq 1
+      expect(users(:logan).devices.first.token).to eq 'canonical123'
     end
   end
 

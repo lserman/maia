@@ -6,7 +6,6 @@ describe 'Sending a test message (poke)' do
     Maia::Poke.new.send_to user
     expect(WebMock).to have_requested(:post, 'https://android.googleapis.com/gcm/send').with body: {
       data: {},
-      content_available: false,
       notification: {
         title: 'Poke',
         body: 'Poke',

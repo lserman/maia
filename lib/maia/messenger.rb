@@ -37,7 +37,11 @@ module Maia
       def update_devices_to_use_canonical_ids(results)
         results.each do |result|
           device = Maia::Device.find_by token: result.token
-          device.update token: result.canonical_id
+          if user_already_has_token_registered?(device.pushable, result.canonical_id)
+            device.destroy
+          else
+            device.update token: result.canonical_id
+          end
         end
       end
 
@@ -47,6 +51,10 @@ module Maia
 
       def connection
         nil # use the default
+      end
+
+      def user_already_has_token_registered?(user, token)
+        user.devices.exists? token: token
       end
   end
 end
