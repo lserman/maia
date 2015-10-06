@@ -25,7 +25,7 @@ module Maia
           case result.error
           when /InvalidRegistration/, /NotRegistered/
             logger.info "Invalid token #{device.token} - destroying device #{device.id}."
-            device.destroy
+            device.destroy if device
           when /MessageTooBig/
             logger.info 'Message sent was too large.'
           when /Timeout/
@@ -37,6 +37,7 @@ module Maia
       def update_devices_to_use_canonical_ids(results)
         results.each do |result|
           device = Maia::Device.find_by token: result.token
+          next if device.nil?
           if user_already_has_token_registered?(device.pushable, result.canonical_id)
             device.destroy
           else
