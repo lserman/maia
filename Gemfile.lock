@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    maia (0.0.2)
+    maia (0.0.3)
       activejob (~> 4.2)
       mercurius (>= 0.1.9)
       rails (~> 4.2)
@@ -135,7 +135,7 @@ GEM
       rspec-support (~> 3.3.0)
     rspec-support (3.3.0)
     safe_yaml (1.0.4)
-    sprockets (3.3.5)
+    sprockets (3.4.0)
       rack (> 1, < 3)
     sprockets-rails (2.3.3)
       actionpack (>= 3.0)
