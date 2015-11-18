@@ -13,13 +13,19 @@ module Maia
       respond_with @device
     end
 
+    def destroy
+      @device = find_device params[:id]
+      @device.destroy
+      respond_with @device
+    end
+
     private
-      def device_exists?
-        current_user.devices.exists? token: params[:device][:token]
+      def device_exists?(token = params[:device][:token])
+        current_user.devices.exists? token: token
       end
 
-      def find_device
-        current_user.devices.find_by token: params[:device][:token]
+      def find_device(token = params[:device][:token])
+        current_user.devices.find_by token: token
       end
 
       def update_token_expiration(device)
