@@ -15,6 +15,18 @@ Capybara.javascript_driver = :webkit
 
 ActiveRecord::Migration.maintain_test_schema!
 
+class ArrayLogger
+  attr_reader :messages
+
+  def initialize
+    @messages = []
+  end
+
+  def info(message)
+    @messages << message
+  end
+end
+
 RSpec.configure do |config|
   config.global_fixtures = :all
   config.fixture_path = File.expand_path("../fixtures", __FILE__)
@@ -32,5 +44,4 @@ RSpec.configure do |config|
   config.before do
     @request.try { |req| req.env['HTTP_ACCEPT'] = 'application/json' }
   end
-
 end
