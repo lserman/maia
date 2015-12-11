@@ -59,7 +59,7 @@ module Maia
         }.compact
       }
 
-      hash.merge!(priority: priority) if priority
+      hash.merge!(priority: priority.to_s) if priority
       hash.merge!(dry_run: true) if dry_run?
       hash.merge!(content_available: true) if content_available?
       hash
