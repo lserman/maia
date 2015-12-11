@@ -27,7 +27,6 @@ module Maia
     end
 
     def badge
-      nil
     end
 
     def sound
@@ -39,7 +38,6 @@ module Maia
     end
 
     def priority
-      :normal
     end
 
     def content_available?
@@ -62,6 +60,7 @@ module Maia
         }.compact
       }
 
+      hash.merge!(priority: priority) if priority
       hash.merge!(dry_run: true) if dry_run?
       hash.merge!(content_available: true) if content_available?
       hash
