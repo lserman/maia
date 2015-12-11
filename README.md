@@ -118,7 +118,7 @@ Will generate the following GCM payload (see [this table](https://developers.goo
 ## Priority
 
 GCM will handle priorities of "normal" and "high". By default, all Maia messages are sent with "normal" priority. You can override
-the `priority` method to return `:normal` or `:high`:
+the `priority` method to return `:normal` or `:high` depending on your needs:
 
 ```ruby
 class ExampleMessage < Maia::Message
