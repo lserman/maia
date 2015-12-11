@@ -38,6 +38,10 @@ module Maia
       {}
     end
 
+    def priority
+      :normal
+    end
+
     def content_available?
       false
     end
@@ -49,6 +53,7 @@ module Maia
     def to_h
       hash = {
         data: other,
+        priority: priority.to_s,
         notification: {
           title: alert,
           body: alert,

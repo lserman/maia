@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    maia (0.0.5)
+    maia (0.0.6)
       activejob (~> 4.2)
       mercurius (>= 0.1.9)
       rails (~> 4.2)

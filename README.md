@@ -115,6 +115,21 @@ Will generate the following GCM payload (see [this table](https://developers.goo
 
 `Maia::Message` does not define a constructor so you can construct your message however you want.
 
+## Priority
+
+GCM will handle priorities of "normal" and "high". By default, all Maia messages are sent with "normal" priority. You can override
+the `priority` method to return `:normal` or `:high`:
+
+```ruby
+class ExampleMessage < Maia::Message
+  # ...
+
+  def priority
+    :high
+  end
+end
+```
+
 ## Content available
 
 To send `"content_available": true` with the GCM payload, override `content_available?` in your message to return a truthy value:

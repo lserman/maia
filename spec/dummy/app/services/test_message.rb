@@ -1,8 +1,9 @@
 class TestMessage < Maia::Message
-  def initialize(sound: 'default', badge: nil, content_available: false)
+  def initialize(sound: 'default', badge: nil, priority: nil, content_available: false)
     @sound = sound
     @badge = badge
     @content_available = content_available
+    @priority = priority
   end
 
   def alert
@@ -19,6 +20,10 @@ class TestMessage < Maia::Message
 
   def content_available?
     @content_available
+  end
+
+  def priority
+    @priority || super
   end
 
   def other
