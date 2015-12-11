@@ -7,15 +7,7 @@ describe 'Sending a message with priority' do
 
   it 'sends the message with high priority' do
     TestMessage.new(priority: :high).send_to user
-    expect(WebMock).to have_requested(:post, 'https://android.googleapis.com/gcm/send').with body: {
-      data: { data: 123 },
-      priority: 'high',
-      notification: {
-        title: 'This is an alert',
-        body: 'This is an alert',
-        sound: 'default'
-      },
-      registration_ids: ['logan123']
-    }.to_json
+    expect(WebMock).to have_requested(:post, 'https://android.googleapis.com/gcm/send')
+      .with body: hash_including(priority: 'high')
   end
 end
