@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rails', '~> 4.2'
   s.add_dependency 'activejob', '~> 4.2'
   s.add_dependency 'responders', '~> 2.0'
-  s.add_dependency 'mercurius', '>= 0.1.9'
+  s.add_dependency 'mercurius', '>= 0.2.0'
 
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'rspec-rails'
