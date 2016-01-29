@@ -19,6 +19,12 @@ describe 'Messaging' do
       }.to_json
     end
 
+    it 'sends a message later' do
+      stub_request(:post, %r[gcm/send]).to_return body: '{}', status: 200
+      expect(Maia::Messenger).to receive(:set).with(wait: 30.seconds) { Maia::Messenger }
+      TestMessage.new.send_to user, wait: 30.seconds
+    end
+
     it 'doesnt send a sound if set to explicitly nil' do
       stub_request(:post, %r[gcm/send]).to_return body: '{}', status: 200
       TestMessage.new(sound: nil).send_to user

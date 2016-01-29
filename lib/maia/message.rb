@@ -2,7 +2,7 @@ module Maia
   class Message
     MAX_TOKENS_AT_ONCE = 999
 
-    def send_to(pushable)
+    def send_to(pushable, wait: false)
       devices =
         case pushable
         when ActiveRecord::Relation
@@ -10,15 +10,17 @@ module Maia
         when ActiveRecord::Base
           pushable.devices
         else
-          raise ArgumentError.new
+          fail 'Maia can only send to ActiveRecord objects!'
         end
 
-      enqueue devices, to_h
+      enqueue devices, to_h, wait: wait
     end
 
-    def enqueue(devices, payload)
+    def enqueue(devices, payload, wait: false)
+      worker = wait ? Maia::Messenger.set(wait: wait) : Maia::Messenger
+
       devices.pluck(:token).each_slice(MAX_TOKENS_AT_ONCE) do |tokens|
-        Maia::Messenger.perform_later tokens, payload.deep_stringify_keys
+        worker.perform_later tokens, payload.deep_stringify_keys
       end
     end
 
