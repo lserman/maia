@@ -5,7 +5,7 @@ module Maia
     def create
       if device_exists?
         @device = find_device
-        update_token_expiration @device
+        update_device @device
       else
         @device = create_device_token
         send_dry_run_to current_user
@@ -28,7 +28,8 @@ module Maia
         current_user.devices.find_by token: token
       end
 
-      def update_token_expiration(device)
+      def update_device(device)
+        device.attributes = permitted_params
         device.reset_token_expiry
         device.save
       end
