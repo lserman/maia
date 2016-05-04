@@ -42,7 +42,7 @@ module Maia
       end
 
       def permitted_params
-        params.require(:device).permit :token
+        params.require(:device).permit :token, :platform
       end
   end
 end

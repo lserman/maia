@@ -17,6 +17,7 @@ ActiveRecord::Schema.define(version: 20150904213047) do
     t.integer  "pushable_id"
     t.string   "pushable_type"
     t.string   "token"
+    t.string   "platform"
     t.datetime "token_expires_at"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false

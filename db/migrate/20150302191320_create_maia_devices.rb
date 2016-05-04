@@ -3,6 +3,7 @@ class CreateMaiaDevices < ActiveRecord::Migration
     create_table :maia_devices do |t|
       t.references :pushable, polymorphic: true, index: true
       t.string :token
+      t.string :platform
       t.datetime :token_expires_at
 
       t.timestamps null: false

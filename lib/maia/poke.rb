@@ -1,6 +1,10 @@
 module Maia
   class Poke < Message
-    def alert
+    def title
+      'Poke'
+    end
+
+    def body
       'Poke'
     end
   end

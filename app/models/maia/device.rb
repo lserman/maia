@@ -3,6 +3,7 @@ module Maia
     belongs_to :pushable, polymorphic: true
 
     validates :token, presence: true, uniqueness: { scope: :pushable }
+    validates :platform, inclusion: { in: %w(ios android) }, allow_nil: true
 
     before_save :reset_token_expiry
 
@@ -19,13 +20,19 @@ module Maia
     end
 
     def self.owned_by(pushable)
-      klass = pushable.klass.name
-      table = pushable.table.name
-      joins("JOIN #{table} ON #{table}.id = #{table_name}.pushable_id").
-        where(pushable_type: klass).
-        merge(pushable).
-        uniq
+      where(pushable: pushable).uniq
     end
 
+    def self.ios
+      where platform: 'ios'
+    end
+
+    def self.android
+      where platform: 'android'
+    end
+
+    def self.unknown
+      where platform: nil
+    end
   end
 end

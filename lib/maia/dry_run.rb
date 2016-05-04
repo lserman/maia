@@ -1,6 +1,10 @@
 module Maia
   class DryRun < Message
-    def alert
+    def title
+      ''
+    end
+
+    def body
       ''
     end
 

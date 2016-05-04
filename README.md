@@ -70,27 +70,79 @@ time a POST to Devices is received, the token expiration will be refreshed.
 
 ## Defining Messages
 
-Maia provides a `Maia::Message` class that provides an interface for defining push messages and sending them. The methods for defining a push are
-`alert`, `badge`, `sound`, and `other`.
+Maia provides a `Maia::Message` class that provides an interface for defining push messages and sending them. To define a message, override `Maia::Message` with
+the data you need:
 
 For example:
 
 ```ruby
 class ExampleMessage < Maia::Message
-  def alert
-    'This is an example'
+  # Required
+  def title
+    'Something happened!'
   end
 
-  def badge
-    2
+  # Required
+  # Body of the message on Android, alert on iOS
+  def body
+    'Something very important has happened, check it out!'
   end
 
+  # Determines the icon to load on Android phones
+  def icon
+    'icn_maia'
+  end
+
+  # Will use 'default' by default. Overriding to nil will prevent sound
   def sound
     'default'
   end
 
-  def other
+  # Badge to use on iOS
+  def badge
+    1
+  end
+
+  # #RRGGBB formatted color to use for the Android notification icon
+  def color
+    '#ffffff'
+  end
+
+  # click_action on Android, category on iOS
+  def action
+    'SOMETHING_HAPPENED'
+  end
+
+  # First argument title_loc_key, remaining arguments are title_loc_args
+  # Translates to title-loc-key and title-loc-args on iOS
+  def title_i18n
+    ['SOMETHING_HAPPENED', 'First argument', 'Second argument']
+  end
+
+  # First argument body_loc_key, remaining arguments are body_loc_args
+  # Translates to body-loc-key and body-loc-args on iOS
+  def body_i18n
+    ['SOMETHING_HAPPENED', 'First argument', 'Second argument']
+  end
+
+  # Any additional data to send with the payload
+  def data
     { foo: :bar }
+  end
+
+  # :normal or :high (:normal by default)
+  def priority
+    :normal
+  end
+
+  # Override to true in order to send the iOS content-available flag
+  def content_available?
+    false
+  end
+
+  # Override to true in order to send a dry run push. This can help debug any device errors without actually sending a push message
+  def dry_run?
+    false
   end
 end
 ```
@@ -99,15 +151,24 @@ Will generate the following GCM payload (see [this table](https://developers.goo
 
 ```json
 {
+  "priority": "normal",
+  "dry_run": false,
+  "content_available": false,
   "data": {
     "foo": "bar"
   },
-  "content_available": false,
   "notification": {
-    "title": "This is an example",
-    "body": "This is an example",
+    "title": "Something happened!",
+    "body": "'Something very important has happened, check it out!'",
+    "icon": "icn_maia",
     "sound": "default",
-    "badge": 2
+    "badge": 1,
+    "color": "#ffffff",
+    "click_action": "SOMETHING_HAPPENED",
+    "body_loc_key": "SOMETHING_HAPPENED",
+    "body_loc_args": ["Argument 1", "Argument 2"],
+    "title_loc_key": "SOMETHING_HAPPENED",
+    "title_loc_args": ["Argument 1", "Argument 2"]
   },
   "registration_ids": ["<TOKEN1>", "<TOKEN2>"]
 }
@@ -115,31 +176,15 @@ Will generate the following GCM payload (see [this table](https://developers.goo
 
 `Maia::Message` does not define a constructor so you can construct your message however you want.
 
-## Priority
+## Omitting the `notification`
 
-GCM will handle priorities of "normal" and "high". By default, all Maia messages are sent with "normal" priority. You can override
-the `priority` method to return `:normal` or `:high` depending on your needs:
-
-```ruby
-class ExampleMessage < Maia::Message
-  # ...
-
-  def priority
-    :high
-  end
-end
-```
-
-## Content available
-
-To send `"content_available": true` with the GCM payload, override `content_available?` in your message to return a truthy value:
+Some applications may want to handle the notification from within, instead of deferring to the OS. To omit the notification hash from the payload,
+override `notify?` with a falsy value. `notify?` accepts the platform as an argument (`:ios`, `:android`, or `:unknown`):
 
 ```ruby
 class ExampleMessage < Maia::Message
-  # ...
-
-  def content_available?
-    true
+  def notify?(platform)
+    platform != :android
   end
 end
 ```
@@ -165,4 +210,4 @@ Maia comes with a built-in message to use to test your configuration out:
 Maia::Poke.new.send_to user
 ```
 
-Will send the alert "Poke" to the device.
+Will send the title/body "Poke" to the device.
