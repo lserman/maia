@@ -7,11 +7,12 @@ describe Maia::Message do
       allow(message).to receive(:to_h) { Hash[test: true] }
       stub_request(:post, %r{gcm/send}).to_return body: '{}', status: 200
       message.send_to user
-      expect(WebMock).to have_requested(:post, 'https://android.googleapis.com/gcm/send').with body: { test: true, registration_ids: ['logan123'] }.to_json
+      expect(WebMock).to have_requested(:post, 'https://android.googleapis.com/gcm/send').with body: { test: true, to: 'logan123' }.to_json
     end
 
     it "doesn't enqueue a worker when the devices for that platform are empty" do
       stub_request(:post, %r{gcm/send}).to_return body: '{}', status: 200
+      expect(Maia::Messenger).to receive(:set) { Maia::Messenger }
       expect(Maia::Messenger).to receive(:perform_later).once
       message.send_to user
     end
@@ -20,6 +21,12 @@ describe Maia::Message do
       stub_request(:post, %r{gcm/send}).to_return body: '{}', status: 200
       expect(Maia::Messenger).to receive(:set).with(wait: 30.seconds) { Maia::Messenger }
       message.send_to user, wait: 30.seconds
+    end
+
+    it 'sends a message with a specific queue' do
+      stub_request(:post, %r{gcm/send}).to_return body: '{}', status: 200
+      expect(Maia::Messenger).to receive(:set).with(queue: :maia) { Maia::Messenger }
+      message.send_to user, queue: :maia
     end
 
     it 'sends the message via GCM and ActiveRecord::Relation' do

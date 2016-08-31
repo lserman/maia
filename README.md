@@ -202,6 +202,14 @@ ExampleMessage.new(...).send_to User.first
 ExampleMessage.new(...).send_to User.where(beta: true)
 ```
 
+## Specifying job options (`wait`, `queue`, etc)
+
+The `send_to` method passes it's last argument into [ActiveJob's `set` method](http://apidock.com/rails/ActiveJob/Core/ClassMethods/set), for example:
+
+```ruby
+ExampleMessage.new(...).send_to User.first, wait: 10.seconds, queue: :maia
+```
+
 ## Sending a test push
 
 Maia comes with a built-in message to use to test your configuration out:

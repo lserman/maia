@@ -13,7 +13,7 @@ describe 'Sending a test message (poke)' do
         body: 'Poke',
         sound: 'default'
       },
-      registration_ids: ['logan123']
+      to: 'logan123'
     }.to_json
   end
 end

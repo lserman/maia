@@ -28,7 +28,7 @@ describe DevicesController do
     it 'sends a dry-run message upon registration to resolve canonical ids' do
       stub_request(:post, %r{gcm/send}).to_return body: '{}', status: 200
       post :create, device: { token: 'token123' }
-      expect(WebMock).to have_requested(:post, 'https://android.googleapis.com/gcm/send').with body: hash_including(dry_run: true, registration_ids: ['token123'])
+      expect(WebMock).to have_requested(:post, 'https://android.googleapis.com/gcm/send').with body: hash_including(dry_run: true, to: 'token123')
     end
   end
 

@@ -2,9 +2,9 @@ module Maia
   class Message
     MAX_TOKENS_AT_ONCE = 999
 
-    def send_to(pushable, wait: false)
+    def send_to(pushable, job_options = {})
       devices = Device.owned_by pushable
-      worker = wait ? Maia::Messenger.set(wait: wait) : Maia::Messenger
+      worker = Maia::Messenger.set job_options
 
       enqueue worker, devices.android, to_h(notify: notify?(:android))
       enqueue worker, devices.ios, to_h(notify: notify?(:ios))
