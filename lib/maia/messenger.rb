@@ -30,10 +30,11 @@ module Maia
       def handle_failed_tokens(results)
         results.each do |result|
           device = Maia::Device.find_by(token: result.token)
-          logger.info "#{result.token} failed: #{result.error}"
-          if device && invalid_token_error?(result.error)
-            logger.info "Invalid token #{device.token} - destroying device #{device.id}."
+          if device && device_unrecoverable?(result.error)
+            log_error "Destroying device #{device.id}", result, device
             device.destroy
+          else
+            log_error "Push to device #{device.id} failed", result, device
           end
         end
       end
@@ -50,12 +51,16 @@ module Maia
         end
       end
 
-      def invalid_token_error?(error)
-        error =~ /InvalidRegistration|NotRegistered/
+      def device_unrecoverable?(error)
+        error =~ /InvalidRegistration|NotRegistered|MismatchSenderId/
       end
 
       def user_already_has_token_registered?(user, token)
         user.devices.exists? token: token
+      end
+
+      def log_error(message, result, device)
+        logger.info "#{message} (error: #{result.error}, token: #{device.token})"
       end
   end
 end
