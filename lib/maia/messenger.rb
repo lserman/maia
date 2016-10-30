@@ -1,6 +1,5 @@
 module Maia
   class Messenger < ActiveJob::Base
-
     def perform(tokens, payload)
       logger.info "Pushing to #{tokens.size} token(s)..."
       logger.info "Payload: #{payload}"
