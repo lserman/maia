@@ -20,7 +20,7 @@ module Maia
     end
 
     def self.owned_by(pushable)
-      where(pushable: pushable).uniq
+      where(pushable: pushable).distinct
     end
 
     def self.ios
