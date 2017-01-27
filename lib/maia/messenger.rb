@@ -29,11 +29,13 @@ module Maia
       def handle_failed_tokens(results)
         results.each do |result|
           device = Maia::Device.find_by(token: result.token)
-          if device && device_unrecoverable?(result.error)
-            log_error "Destroying device #{device.id}", result, device
-            device.destroy
-          else
-            log_error "Push to device #{device.id} failed", result, device
+          if device
+            if device_unrecoverable?(result.error)
+              log_error "Destroying device #{device.id}", result, device
+              device.destroy
+            else
+              log_error "Push to device #{device.id} failed", result, device
+            end
           end
         end
       end

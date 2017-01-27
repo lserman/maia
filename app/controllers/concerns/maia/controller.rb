@@ -5,7 +5,6 @@ module Maia
     def create
       if device_exists?
         @device = find_device
-        Rails.logger.debug "#{@device}"
         update_device @device
       else
         @device = create_device_token
@@ -26,7 +25,6 @@ module Maia
       end
 
       def find_device(token = params[:device][:token])
-        Rails.logger.debug "#{token}"
         current_user.devices.find_by token: token
       end
 
