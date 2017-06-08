@@ -1,5 +1,5 @@
 module Maia
-  class Device < ActiveRecord::Base
+  class Device < ApplicationRecord
     belongs_to :pushable, polymorphic: true
 
     validates :token, presence: true, uniqueness: { scope: :pushable }
