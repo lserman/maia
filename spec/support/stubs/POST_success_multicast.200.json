@@ -1,0 +1,14 @@
+{
+  "multicast_id": "cast123",
+  "success": 1,
+  "failure": 0,
+  "canonical_ids": 1,
+  "results": [{
+    "message_id": "123"
+  }, {
+    "message_id": "456",
+    "registration_id": "token456"
+  }, {
+    "message_id": "789"
+  }]
+}

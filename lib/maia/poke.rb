@@ -1,11 +1,11 @@
 module Maia
   class Poke < Message
     def title
-      'Poke'
+      'Poke!'
     end
 
     def body
-      'Poke'
+      'This is a test push, please ignore me.'
     end
   end
 end

@@ -1,19 +1,17 @@
 module Maia
   class Message
-    MAX_TOKENS_AT_ONCE = 999
-
     def send_to(pushable, job_options = {})
       devices = Device.owned_by pushable
-      worker = Maia::Messenger.set job_options
+      worker  = Messenger.set job_options
 
-      enqueue worker, devices.android, to_h(notify: notify?(:android))
-      enqueue worker, devices.ios, to_h(notify: notify?(:ios))
-      enqueue worker, devices.unknown, to_h(notify: notify?(:unknown))
+      enqueue worker, devices.android
+      enqueue worker, devices.ios
+      enqueue worker, devices.unknown
     end
 
-    def enqueue(worker, devices, payload)
-      devices.pluck(:token).each_slice MAX_TOKENS_AT_ONCE do |tokens|
-        worker.perform_later tokens, payload.deep_stringify_keys
+    def enqueue(worker, devices)
+      devices.in_batches(of: Maia::BATCH_SIZE) do |devices|
+        worker.perform_later devices.pluck(:token), to_h.deep_stringify_keys
       end
     end
 
@@ -23,28 +21,20 @@ module Maia
     def body
     end
 
+    def on_click
+    end
+
     def icon
     end
 
     def sound
-      'default'
+      :default
     end
 
     def badge
     end
 
     def color
-    end
-
-    def action
-    end
-
-    def title_i18n
-      []
-    end
-
-    def body_i18n
-      []
     end
 
     def data
@@ -62,60 +52,26 @@ module Maia
       false
     end
 
-    def notify?(_platform = :unknown)
-      true
-    end
-
     def notification
       {
         title: title,
         body: body,
         icon: icon,
-        sound: sound,
+        sound: sound.to_s,
         badge: badge,
         color: color,
-        click_action: action
-      }.merge(i18n).compact
+        click_action: on_click
+      }.compact
     end
 
-    def to_h(notify: true)
-      payload = {
+    def to_h
+      {
         priority: priority.to_s,
         dry_run: dry_run?,
         content_available: content_available?,
-        data: data
-      }
-
-      payload[:notification] = notification if notify
-      payload.compact
+        data: data,
+        notification: notification
+      }.compact
     end
-
-    private
-      def i18n
-        {}.tap do |hash|
-          hash[:body_loc_key] = body_i18n.first
-          hash[:body_loc_args] = body_i18n_args
-          hash[:title_loc_key] = title_i18n_key
-          hash[:title_loc_args] = title_i18n_args
-        end.compact
-      end
-
-      def body_i18n_key
-        body_i18n.first
-      end
-
-      def body_i18n_args
-        args = body_i18n.drop 1
-        args if args.any?
-      end
-
-      def title_i18n_key
-        title_i18n.first
-      end
-
-      def title_i18n_args
-        args = title_i18n.drop 1
-        args if args.any?
-      end
   end
 end

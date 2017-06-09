@@ -3,7 +3,6 @@ describe DevicesController do
 
   describe 'POST create' do
     it 'creates a new device for a user' do
-      stub_request(:post, %r{gcm/send}).to_return body: '{}', status: 200
       post :create, params: { device: { token: 'token123', platform: 'android' } }
       expect(user.reload.devices.size).to eq 1
       expect(user.devices[0].token).to eq 'token123'
@@ -18,7 +17,6 @@ describe DevicesController do
     end
 
     it 'updates the expiration time whenever POSTing the same device token for a user' do
-      stub_request(:post, %r{gcm/send}).to_return body: '{}', status: 200
       post :create, params: { device: { token: 'token123' } }
       expiry1 = Maia::Device.last.token_expires_at.to_s(:nsec)
       post :create, params: { device: { token: 'token123' } }
@@ -27,9 +25,10 @@ describe DevicesController do
     end
 
     it 'sends a dry-run message upon registration to resolve canonical ids' do
-      stub_request(:post, %r{gcm/send}).to_return body: '{}', status: 200
+      dry_run = double :dry_run
+      expect(Maia::DryRun).to receive(:new) { dry_run }
+      expect(dry_run).to receive(:send_to).with user
       post :create, params: { device: { token: 'token123' } }
-      expect(WebMock).to have_requested(:post, 'https://android.googleapis.com/gcm/send').with body: hash_including(dry_run: true, to: 'token123')
     end
   end
 
