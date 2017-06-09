@@ -6,8 +6,13 @@ describe Maia::FCM::Connection do
       webmock 'POST_success.200.json'
       subject.write 'test' => 'test'
       expect(WebMock).to have_requested(:post, described_class::URL).with({
-        headers: { 'Content-Type' => 'application/json' },
-        body: { 'test' => 'test' }
+        headers: {
+          'Content-Type' => 'application/json',
+          'Authorization' => 'key=key123'
+        },
+        body: {
+          'test' => 'test'
+        }
       })
     end
   end

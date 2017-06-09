@@ -8,13 +8,20 @@ module Maia
       end
 
       def write(payload = {})
-        request = Net::HTTP::Post.new uri, 'Content-Type' => 'application/json'
+        request = Net::HTTP::Post.new uri, headers
         request.body = payload.to_json
         http.request request
       end
 
       def uri
         URI(URL)
+      end
+
+      def headers
+        {
+          'Content-Type' => 'application/json',
+          'Authorization' => "key=#{@key}"
+        }
       end
 
       def http
