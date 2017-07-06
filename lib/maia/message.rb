@@ -48,6 +48,10 @@ module Maia
       false
     end
 
+    def content_mutable?
+      false
+    end
+
     def dry_run?
       false
     end
@@ -69,6 +73,7 @@ module Maia
         priority: priority.to_s,
         dry_run: dry_run?,
         content_available: content_available?,
+        mutable_content: content_mutable?,
         data: data,
         notification: notification
       }.compact

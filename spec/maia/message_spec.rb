@@ -62,6 +62,12 @@ describe Maia::Message do
     end
   end
 
+  describe '#content_mutable?' do
+    it 'is false by default' do
+      expect(subject).to_not be_content_mutable
+    end
+  end
+
   describe '#dry_run?' do
     it 'is false by default' do
       expect(subject).to_not be_dry_run
@@ -119,6 +125,11 @@ describe Maia::Message do
     it 'contains the content available status' do
       expect(subject).to receive(:content_available?) { true }
       expect(subject.to_h[:content_available]).to eq true
+    end
+
+    it 'contains the content mutable status' do
+      expect(subject).to receive(:content_mutable?) { true }
+      expect(subject.to_h[:mutable_content]).to eq true
     end
 
     it 'contains the data' do
