@@ -1,6 +1,6 @@
 # Maia
 
-This project maintains a `Maia::Device` model and facilitates the delivery of push notifications for iOS and Android through FCM.
+This project maintains a `Maia::Device` model and facilitates the delivery of push notifications for iOS and Android through FCM (Firebase Cloud Messaging).
 
 ## Installation
 
@@ -16,6 +16,14 @@ This will copy the `maia_devices` table into your project.
 ## Setup
 
 Maia relies on [ActiveJob](https://github.com/rails/rails/tree/master/activejob) to enqueue messages. Ensure your application is properly setup with ActiveJob!
+
+Set your FCM key in an initializer, such as `config/initializers/maia.rb`:
+
+```ruby
+Maia::FCM.key = Rails.application.secrets[:fcm][:key]
+```
+
+Alternatively, you can set `ENV['FCM_KEY']`, which Maia will check first.
 
 Include `Maia::Model` into your User model. This will attach the `has_many` relationship you need with `Maia::Device`:
 
