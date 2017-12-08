@@ -25,7 +25,7 @@ module Maia
       end
 
       def find_device(token = params[:device][:token])
-        current_user.devices.find_by token: token
+        current_user.devices.find_by! token: token
       end
 
       def update_device(device)
