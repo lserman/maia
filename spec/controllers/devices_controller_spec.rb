@@ -41,5 +41,11 @@ describe DevicesController do
         user.reload.devices.count
       }.by(-1)
     end
+
+    it 'returns an error message if no device found' do
+      expect {
+        delete :destroy, params: { id: 'none' }
+      }.to raise_error ActiveRecord::RecordNotFound, 'Device not found'
+    end
   end
 end
