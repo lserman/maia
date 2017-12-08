@@ -25,9 +25,7 @@ module Maia
       end
 
       def find_device(token = params[:device][:token])
-        device = current_user.devices.find_by token: token
-        raise ActiveRecord::RecordNotFound.new('Device not found') unless device
-        device
+        current_user.devices.find_by! token: token
       end
 
       def update_device(device)

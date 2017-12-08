@@ -45,7 +45,7 @@ describe DevicesController do
     it 'returns an error message if no device found' do
       expect {
         delete :destroy, params: { id: 'none' }
-      }.to raise_error ActiveRecord::RecordNotFound, 'Device not found'
+      }.to raise_error ActiveRecord::RecordNotFound, /Couldn't find Maia::Device/
     end
   end
 end
