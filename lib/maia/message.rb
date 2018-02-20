@@ -10,8 +10,8 @@ module Maia
     end
 
     def enqueue(worker, devices)
-      devices.in_batches(of: Maia::BATCH_SIZE) do |devices|
-        worker.perform_later devices.pluck(:token), to_h.deep_stringify_keys
+      devices.find_in_batches(batch_size: Maia::BATCH_SIZE) do |devices|
+        worker.perform_later devices.collect(&:token), to_h.deep_stringify_keys
       end
     end
 
