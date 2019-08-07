@@ -26,7 +26,7 @@ describe Maia::FCM::Service do
 
     it 'uses the topic: FCM param when sending to a topic' do
       subject.deliver Hash[title: 'Test'], topic: 'test-123'
-      expect(WebMock).to have_requested(:post, /fcm/).with body: hash_including(topic: 'test-123')
+      expect(WebMock).to have_requested(:post, /fcm/).with body: hash_including(to: '/topics/test-123')
     end
 
     it 'calls the FCM API in batches' do
