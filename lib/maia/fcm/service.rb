@@ -11,18 +11,18 @@ module Maia
 
       def deliver(notification, *tokens, topic: nil)
         responses = ResponseCollection.new notification
-        responses << deliver_all(notification, tokens)
-        responses << deliver_all(notification, topic) if topic
+        responses << deliver_to_tokens(notification, tokens)
+        responses << deliver_to_topic(notification, topic) if topic
         responses
       end
 
       private
-        def deliver_all(notification, recipients)
-          batch(recipients).map do |batch|
-            if batch.many?
-              multicast notification, batch
-            elsif batch.one?
+        def deliver_to_tokens(notification, tokens)
+          batch(tokens).map do |batch|
+            if batch.one?
               unicast notification, batch.first
+            elsif batch.many?
+              multicast notification, batch
             end
           end
         end
@@ -33,6 +33,10 @@ module Maia
 
         def multicast(notification, recipients)
           deliver! notification, recipients, registration_ids: recipients
+        end
+
+        def deliver_to_topic(notification, topic)
+          deliver! notification, [], topic: topic
         end
 
         def deliver!(notification, recipients, params = {})

@@ -24,6 +24,11 @@ describe Maia::FCM::Service do
       expect(WebMock).to have_requested(:post, /fcm/).with body: hash_including(registration_ids: %w(token1 token2))
     end
 
+    it 'uses the topic: FCM param when sending to a topic' do
+      subject.deliver Hash[title: 'Test'], topic: 'test-123'
+      expect(WebMock).to have_requested(:post, /fcm/).with body: hash_including(topic: 'test-123')
+    end
+
     it 'calls the FCM API in batches' do
       stub_const 'Maia::BATCH_SIZE', 2
       subject.deliver Hash[title: 'Test'], %w(token1 token2 token3 token4 token5)
