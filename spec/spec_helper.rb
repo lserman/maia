@@ -4,11 +4,7 @@ require File.expand_path('../../spec/dummy/config/environment.rb', __FILE__)
 ActiveRecord::Migrator.migrations_paths = [File.expand_path('../../spec/dummy/db/migrate', __FILE__)]
 
 require 'rspec/rails'
-require 'capybara/rails'
-require 'capybara/rspec'
 require 'webmock/rspec'
-
-Capybara.javascript_driver = :webkit
 
 ActiveRecord::Migration.maintain_test_schema!
 ActiveJob::Base.queue_adapter = :test
