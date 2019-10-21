@@ -23,6 +23,10 @@ module Maia
       where(pushable: pushable).distinct
     end
 
+    def self.tokens
+      pluck(:token)
+    end
+
     def self.ios
       where platform: 'ios'
     end

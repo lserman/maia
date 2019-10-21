@@ -8,7 +8,6 @@ module Maia
         update_device @device
       else
         @device = create_device_token
-        send_dry_run_to current_user
       end
       respond_with @device
     end
@@ -36,10 +35,6 @@ module Maia
 
       def create_device_token
         current_user.devices.create permitted_params
-      end
-
-      def send_dry_run_to(user)
-        Maia::DryRun.new.send_to user
       end
 
       def permitted_params

@@ -2,6 +2,9 @@
 
 This project maintains a `Maia::Device` model and facilitates the delivery of push notifications for iOS and Android through FCM (Firebase Cloud Messaging).
 
+As of Maia 5, only the FCM HTTP v1 is supported. Use an older version of Maia if
+you need to use the FCM legacy API.
+
 ## Installation
 
 ```
@@ -13,26 +16,38 @@ bin/rake db:migrate
 
 This will copy the `maia_devices` table into your project.
 
-## Setup
+### Messenger configuration
 
-Maia relies on [ActiveJob](https://github.com/rails/rails/tree/master/activejob) to enqueue messages. Ensure your application is properly setup with ActiveJob!
+Maia is setup to use [ActiveJob](https://github.com/rails/rails/tree/master/activejob)
+as it's default messenger. If you want to send messages inline instead, use the inline adapter:
 
-Set your FCM key in an initializer, such as `config/initializers/maia.rb`:
-
-```ruby
-Maia::FCM.key = Rails.application.secrets[:fcm][:key]
+```
+Maia.messenger = Maia::Messengers::Inline.new
 ```
 
-Alternatively, you can set `ENV['FCM_KEY']`, which Maia will check first.
+or set it to anything that responds to `#deliver(payload)`.
+
+### Gateway configuration
+
+Maia uses the FCM HTTP v1 gateway by default. This assumes you are using `['GOOGLE_APPLICATION_CREDENTIALS']`
+for authentication, so you should be good to go if this environment variable is set. If not, you can pass a custom
+object to the FCM gateway as long as it responds to `#project` and `#token`.
+
+```
+Maia.gateway = Maia::FCM::Gateway.new CustomFCMCredentials.new
+```
+
+### Rails configuration
 
 Include `Maia::Model` into your User model. This will attach the `has_many` relationship you need with `Maia::Device`:
 
 ```ruby
 class User
   include Maia::Model
-  # ...
 end
 ```
+
+## Device Registration
 
 Create a Devices controller where you need it, which is most likely an API. The controller itself will be generated within your application so that Maia does not make any assumptions about your method of authentication, `respond_with` mimetypes, etc. The only requirement is that `current_user` exists and returns whatever model included `Maia::Model`.
 
@@ -50,25 +65,17 @@ class API::DevicesController
 
 Maia provides the `create` method for you, so devices can now register themselves by POSTing to that controller. If you'd like to add any other actions, feel free.
 
-## Device Registration
-
 Devices can register with your application by submitting a POST to your devices controller with these params:
 
 ```
 { "device": { "token": "<TOKEN>" } }
 ```
 
-Where `<TOKEN>` is the token from FCM registration.
-
-## Device Management
-
-When FCM responds with an invalid or unregistered device token, the device record will be destroyed from the database.
-
-When FCM responds with a canonical ID, the device record will be updated so that it's `token` field will be equal to the canonical ID given by FCM.
+Where `<TOKEN>` is the token from FCM registration. Maia will automatically destroy devices when FCM responds with an `UNREGISTERED` error.
 
 ## Device Expiration
 
-Devices will expire after 14 days. This is to ensure user's who sell or otherwise give away their device will not be tied to that device forever. Each time a POST to Devices is received, the token expiration will be refreshed.
+Devices will expire after 14 days. This is to ensure users who sell or otherwise give away their device will not be tied to that device forever. Each time a POST to Devices is received, the token expiration will be refreshed.
 
 ## Defining Messages
 
@@ -87,16 +94,16 @@ class ExampleMessage < Maia::Message
   end
 
   # Determines the icon to load on Android phones
-  def icon
+  def image
     'icn_maia'
   end
 
-  # Will use 'default' by default. Overriding to nil will prevent sound
+  # Sound to play on arrival (nil by default)
   def sound
     'default'
   end
 
-  # Badge to use on iOS
+  # Badge to use on iOS (nil by default)
   def badge
     1
   end
@@ -104,11 +111,6 @@ class ExampleMessage < Maia::Message
   # #RRGGBB formatted color to use for the Android notification icon
   def color
     '#ffffff'
-  end
-
-  # click_action on Android, category on iOS
-  def on_click
-    'SOMETHING_HAPPENED'
   end
 
   # Any additional data to send with the payload
@@ -122,45 +124,17 @@ class ExampleMessage < Maia::Message
   end
 
   # Override to true in order to send the iOS content-available flag
-  def content_available?
-    false
-  end
-
-  # Override to true in order to send a dry run push. This can help debug any device errors without actually sending a push message
-  def dry_run?
+  def background?
     false
   end
 end
-```
-
-This message will generate the following FCM payload:
-
-```json
-{
-  "priority": "normal",
-  "dry_run": false,
-  "content_available": false,
-  "data": {
-    "foo": "bar"
-  },
-  "notification": {
-    "title": "Something happened!",
-    "body": "'Something very important has happened, check it out!'",
-    "icon": "icn_maia",
-    "sound": "default",
-    "badge": 1,
-    "color": "#ffffff",
-    "click_action": "SOMETHING_HAPPENED",
-  },
-  "registration_ids": ["<TOKEN1>", "<TOKEN2>"]
-}
 ```
 
 `Maia::Message` does not define a constructor so you can construct your message however you want.
 
 ## Sending messages
 
-`Maia::Message` provides a `send_to` that pushes the message out to a user (or collection of users). The argument to `send_to` should be a single record or relation of records.
+`Maia::Message` provides a `send_to` method that pushes the message out to a user (or collection of users). The argument to `send_to` should be a single record or relation of records.
 
 For example:
 
@@ -169,14 +143,16 @@ ExampleMessage.new(...).send_to User.first
 ExampleMessage.new(...).send_to User.where(beta: true)
 ```
 
-`send_to` will batch users in groups of 999 tokens (FCM limitation) and send them via ActiveJob.
-
-## Specifying job options (`wait`, `queue`, etc)
-
-The `send_to` method passes it's last argument into [ActiveJob's `set` method](http://apidock.com/rails/ActiveJob/Core/ClassMethods/set), for example:
+You can also send a message directly to a raw token:
 
 ```ruby
-ExampleMessage.new(...).send_to User.first, wait: 10.seconds, queue: :maia
+ExampleMessage.new(...).send_to token: 'token123'
+```
+
+or to a topic:
+
+```ruby
+ExampleMessage.new(...).send_to topic: 'my-topic'
 ```
 
 ## Sending a test push
