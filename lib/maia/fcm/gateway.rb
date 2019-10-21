@@ -23,7 +23,7 @@ module Maia
 
       private
         def connection
-          @connection ||= Maia::FCM::Connection.new(@auth.project, @auth.token)
+          Maia::FCM::Connection.new(@auth.project, @auth.token)
         end
     end
   end
