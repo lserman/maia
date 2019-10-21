@@ -1,82 +1,41 @@
 module Maia
   class Message
-    def send_to(pushable, job_options = {})
-      devices = Device.owned_by pushable
-      worker  = Messenger.set job_options
+    def title; end
+    def body;  end
+    def image; end
+    def badge; end
+    def color; end
+    def background?; end
+    def priority; end
 
-      enqueue worker, devices.android
-      enqueue worker, devices.ios
-      enqueue worker, devices.unknown
-    end
-
-    def enqueue(worker, devices)
-      devices.in_batches(of: Maia::BATCH_SIZE) do |devices|
-        worker.perform_later devices.pluck(:token), to_h.deep_stringify_keys
-      end
-    end
-
-    def title
-    end
-
-    def body
-    end
-
-    def on_click
-    end
-
-    def icon
+    def data
+      {}
     end
 
     def sound
-      :default
+      'default'
     end
 
-    def badge
+    def targeting(target)
+      tap { @target = target }
     end
 
-    def color
+    def to_json
+      to_h.to_json
     end
 
-    def data
-    end
+    def send_to(*models, topic: nil, token: nil, messenger: Maia.messenger)
+      targets = []
+      targets << Maia::Topic.new(topic) if topic
+      targets << Maia::Token.new(token) if token
 
-    def priority
-      :normal
-    end
+      Maia::Devices.new(models).each do |t|
+        targets << t
+      end
 
-    def content_available?
-      false
-    end
-
-    def content_mutable?
-      false
-    end
-
-    def dry_run?
-      false
-    end
-
-    def notification
-      {
-        title: title,
-        body: body,
-        icon: icon,
-        sound: sound.to_s,
-        badge: badge,
-        color: color,
-        click_action: on_click
-      }.compact
-    end
-
-    def to_h
-      {
-        priority: priority.to_s,
-        dry_run: dry_run?,
-        content_available: content_available?,
-        mutable_content: content_mutable?,
-        data: data,
-        notification: notification
-      }.compact
+      targets.map do |target|
+        messenger.deliver Maia.gateway.serialize(self, target)
+      end
     end
   end
 end

@@ -23,13 +23,6 @@ describe DevicesController do
       expiry2 = Maia::Device.last.token_expires_at.to_s(:nsec)
       expect(expiry2).to be > expiry1
     end
-
-    it 'sends a dry-run message upon registration to resolve canonical ids' do
-      dry_run = double :dry_run
-      expect(Maia::DryRun).to receive(:new) { dry_run }
-      expect(dry_run).to receive(:send_to).with user
-      post :create, params: { device: { token: 'token123' } }
-    end
   end
 
   describe 'DELETE destroy' do

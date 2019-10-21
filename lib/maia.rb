@@ -1,22 +1,34 @@
-require 'rails'
-require 'active_support/core_ext/enumerable'
+require 'rails/all'
 
 require 'maia/engine'
 require 'maia/message'
-require 'maia/messenger'
 require 'maia/poke'
-require 'maia/dry_run'
-require 'maia/error'
+require 'maia/token'
+require 'maia/topic'
+require 'maia/devices'
 
-require 'maia/fcm'
+require 'maia/messengers/array'
+require 'maia/messengers/inline'
+require 'maia/messengers/activejob'
+
+require 'maia/error/generic'
+require 'maia/error/unregistered'
+require 'maia/error/no_credentials'
+
 require 'maia/fcm/connection'
+require 'maia/fcm/credentials'
+require 'maia/fcm/gateway'
 require 'maia/fcm/notification'
-require 'maia/fcm/response_collection'
 require 'maia/fcm/response'
-require 'maia/fcm/result_collection'
-require 'maia/fcm/result'
-require 'maia/fcm/service'
+require 'maia/fcm/serializer'
+require 'maia/fcm/platform/android'
+require 'maia/fcm/platform/apns'
 
 module Maia
-  BATCH_SIZE = 999
+  class << self
+    attr_accessor :gateway, :messenger
+  end
 end
+
+Maia.gateway   = Maia::FCM::Gateway.new Maia::FCM::Credentials.new
+Maia.messenger = Maia::Messengers::ActiveJob.new

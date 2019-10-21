@@ -1,24 +1,48 @@
 describe Maia::FCM::Notification do
-  subject { described_class.new attributes }
-  let(:attributes) { { one: 1, two: 2 } }
+  subject { described_class.new message }
+
+  let(:message) do
+    double(:message, title: 'title', body: 'body', image: 'image')
+  end
+
+  describe '#title' do
+    it 'returns the message title' do
+      expect(subject.title).to eq 'title'
+    end
+  end
+
+  describe '#body' do
+    it 'returns the message body' do
+      expect(subject.body).to eq 'body'
+    end
+  end
+
+  describe '#image' do
+    it 'returns the message image' do
+      expect(subject.image).to eq 'image'
+    end
+  end
 
   describe '#to_h' do
-    it 'returns the attributes' do
-      expect(subject.to_h).to eq attributes
+    it 'returns the FCM serialization of a notification' do
+      expect(subject.to_h).to eq({
+        title: 'title',
+        body: 'body',
+        image: 'image'
+      })
     end
-  end
 
-  describe '#==' do
-    it 'returns true if the other object has the same attribute' do
-      expect(subject).to eq double(attributes: attributes)
-    end
-  end
+    context 'nil attribute' do
+      let(:message) do
+        double(:message, title: 'title', body: 'body', image: nil)
+      end
 
-  describe '#method_missing' do
-    it 'delegates method calls to the attributes hash' do
-      expect(subject.one).to eq 1
-      expect(subject.two).to eq 2
-      expect { subject.three }.to raise_error NoMethodError
+      it 'does not include nil attributes' do
+        expect(subject.to_h).to eq({
+          title: 'title',
+          body: 'body'
+        })
+      end
     end
   end
 end

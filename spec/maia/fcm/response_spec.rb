@@ -1,8 +1,10 @@
 describe Maia::FCM::Response do
-  subject { described_class.new double(body: json, code: status), tokens }
+  subject { described_class.new double(body: json, code: status) }
+  let(:stub) { 'fcm/success.json' }
 
-  let(:tokens) { [1, 2, 3] }
-  let(:json) { File.read File.join(__dir__, '..', '..', 'support', 'stubs', 'POST_success_multicast.200.json') }
+  let(:json) do
+    File.read File.join(__dir__, '..', '..', 'support', 'stubs', stub)
+  end
 
   describe 'success' do
     let(:status) { 200 }
@@ -33,41 +35,34 @@ describe Maia::FCM::Response do
         expect(subject).to_not be_success
       end
     end
-
-    describe '#results' do
-      it 'returns a collection results' do
-        expect(subject.results[0].token).to eq 1
-        expect(subject.results[1].token).to eq 2
-        expect(subject.results[2].token).to eq 3
-      end
-    end
   end
 
   describe 'failure' do
+    let(:status) { 400 }
+
+    describe '#fail?' do
+      it 'returns true' do
+        expect(subject).to be_fail
+      end
+    end
+
     describe '#error' do
       subject { super().error }
 
-      context '400' do
-        let(:status) { 400 }
+      context 'Unregistered token' do
+        let(:stub) { 'fcm/UNREGISTERED.json' }
 
-        it 'is an invalid JSON error' do
-          expect(subject).to include 'Invalid JSON'
+        it 'returns an Unregistered error' do
+          expect(subject).to be_a_kind_of(Maia::Error::Unregistered)
         end
       end
 
-      context '401' do
-        let(:status) { 401 }
+      context 'Other error' do
+        let(:stub) { 'fcm/INVALID_ARGUMENT.json' }
 
-        it 'is an authentication error' do
-          expect(subject).to include 'Authentication error'
-        end
-      end
-
-      context '5xx' do
-        let(:status) { 502 }
-
-        it 'is an internal error' do
-          expect(subject).to include 'Internal server error'
+        it 'returns a generic error' do
+          expect(subject).to be_a_kind_of(Maia::Error::Generic)
+          expect(subject.message).to eq 'The registration token is not a valid FCM registration token'
         end
       end
     end
