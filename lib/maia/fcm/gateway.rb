@@ -1,7 +1,7 @@
 module Maia
   module FCM
     class Gateway
-      def initialize(auth)
+      def initialize(auth = Maia::FCM::Credentials.new)
         @auth = auth
       end
 

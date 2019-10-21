@@ -7,10 +7,6 @@ module Maia
 
       def initialize(path = ENV['GOOGLE_APPLICATION_CREDENTIALS'])
         @path = path
-
-        if @path.nil? or !File.exist?(@path)
-          raise Maia::Error::NoCredentials
-        end
       end
 
       def project
@@ -27,7 +23,11 @@ module Maia
 
       private
         def file
-          File.new @path
+          if @path && File.exist?(@path)
+            File.new @path
+          else
+            raise Maia::Error::NoCredentials
+          end
         end
 
         def credentials

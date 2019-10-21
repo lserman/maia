@@ -30,5 +30,5 @@ module Maia
   end
 end
 
-Maia.gateway   = Maia::FCM::Gateway.new Maia::FCM::Credentials.new
+Maia.gateway   = Maia::FCM::Gateway.new
 Maia.messenger = Maia::Messengers::ActiveJob.new
