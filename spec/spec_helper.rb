@@ -7,7 +7,12 @@ ActiveRecord::Migrator.migrations_paths = [File.expand_path('../../spec/dummy/db
 require 'rspec/rails'
 require 'webmock/rspec'
 
-ActiveRecord::Migration.maintain_test_schema!
+case Rails::VERSION::MAJOR
+when 5, 6
+  ActiveRecord::Migration.maintain_test_schema!
+when 7
+  ActiveRecord.maintain_test_schema = true
+end
 ActiveJob::Base.queue_adapter = :test
 
 RSpec.configure do |config|
