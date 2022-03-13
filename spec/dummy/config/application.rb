@@ -11,8 +11,14 @@ require 'maia'
 
 module Dummy
   class Application < Rails::Application
-    config.assets.enabled = false
+    case Rails::VERSION::MAJOR
+    when 5, 6
+      config.assets.enabled = false
+      config.active_record&.sqlite3&.represent_boolean_as_integer = true
+    when 7
+      config.active_record.legacy_connection_handling = false
+    end
+
     config.active_job.queue_adapter = :inline
-    config.active_record.sqlite3.represent_boolean_as_integer = true
   end
 end
