@@ -6,6 +6,7 @@ ActiveRecord::Migrator.migrations_paths = [File.expand_path('../../spec/dummy/db
 
 require 'rspec/rails'
 require 'webmock/rspec'
+require 'pry'
 
 ActiveRecord::Migration.maintain_test_schema!
 ActiveJob::Base.queue_adapter = :test
