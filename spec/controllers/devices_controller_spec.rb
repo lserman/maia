@@ -18,9 +18,9 @@ describe DevicesController do
 
     it 'updates the expiration time whenever POSTing the same device token for a user' do
       post :create, params: { device: { token: 'token123' } }
-      expiry1 = Maia::Device.last.token_expires_at.to_s(:nsec)
+      expiry1 = Maia::Device.last.token_expires_at.nsec
       post :create, params: { device: { token: 'token123' } }
-      expiry2 = Maia::Device.last.token_expires_at.to_s(:nsec)
+      expiry2 = Maia::Device.last.token_expires_at.nsec
       expect(expiry2).to be > expiry1
     end
   end
